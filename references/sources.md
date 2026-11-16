@@ -21,14 +21,14 @@
 | 官方说法 | 出处 | 怎么用 |
 | --- | --- | --- |
 | ✓ 子 agent 新版默认能再往下开三层，`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` 改 | https://code.claude.com/docs/en/sub-agents ｜已验证（Claude Code 2.1.322 里也有这个设置；2026-11-15 的记录里，总控的一个子 agent 真的又开了一个查找用的子 agent） | 「子 agent 不能再开子 agent」已经不对了。改成讲为什么要往下派的活还是开成线 |
-| ✓ 每个子 agent 可单独写 `model` 和 `effort`；查找类用 Haiku | 同上；https://code.claude.com/docs/en/model-config ｜已验证 | 第三节表格 |
+| ✓ 每个子 agent 可单独写 `model` 和 `effort`；查找类用便宜档（官方举的是 Haiku） | 同上；https://code.claude.com/docs/en/model-config ｜已验证 | 第三节表格 |
 | ✓ 上下文都对了还错，是模型不够，换大模型；max 容易想过头 | https://claude.com/resources/articles/claude-model-and-effort-level-in-claude-code ｜已验证 | 第三节。官方另一半「漏文件、没跑测试就调高思考强度」没照搬：作者的经验是先查任务书写没写清，强度开高了反而爱扩大范围 |
-| ✓ 命令行交互会话撞上 5 小时额度，重置后自己接着做，最多 3 次；周额度、后台、`-p` 不会 | https://code.claude.com/docs/en/interactive-mode ｜已验证 | 第六节「撞墙了」。桌面端会不会自己接：没验证；2026-11-15 撞上组织花费上限那次没有自己接 |
+| ✓ 命令行交互会话撞上 5 小时额度，重置后自己接着做，最多 3 次；周额度、后台、`-p` 不会 | https://code.claude.com/docs/en/interactive-mode ｜已验证 | `quota.md`「撞墙了」。桌面端会不会自己接：没验证；2026-11-15 撞上组织花费上限那次没有自己接 |
 | ✓ 状态栏 JSON 有 `rate_limits.five_hour / seven_day` 的百分比和重置时刻（Pro / Max / Ultra） | https://code.claude.com/docs/en/statusline ｜已验证 | `tools.md` |
 | ✓ 定时只在会话空着时触发，循环的会晚最多半个周期（封顶 30 分钟），7 天过期，错过不补 | https://code.claude.com/docs/en/scheduled-tasks ｜已验证 | 第五节、`tools.md` |
 | ✓ 开 10 个后台会话，额度大约是 1 个的 10 倍；多 agent 的 token 约是聊天的 15 倍 | https://code.claude.com/docs/en/agent-view ；https://www.anthropic.com/engineering/multi-agent-research-system ｜已验证 | 第六节「N 倍地烧」 |
-| ✓ 「卡住」先排除在等权限批准；常用权限先放开 | https://code.claude.com/docs/en/agent-view ｜已验证 | 第零节第 5 步、第五节 |
-| ✓ auto 模式：分类器先审再执行；连拒 3 次或累计 20 次就退回逐条问人；ask 规则照样弹 | https://code.claude.com/docs/en/permission-modes ｜已验证 | 第零节第 5 步；线的规矩「被拒了别重试同一件事」 |
+| ✓ 「卡住」先排除在等权限批准；常用权限先放开 | https://code.claude.com/docs/en/agent-view ｜已验证 | 第零节「开工前备好」、第五节 |
+| ✓ auto 模式：分类器先审再执行；连拒 3 次或累计 20 次就退回逐条问人；ask 规则照样弹 | https://code.claude.com/docs/en/permission-modes ｜已验证 | 第零节「开工前备好」；线的规矩「被拒了别重试同一件事」 |
 | ✓ 别的会话发来的消息不能替用户批准任何东西 | https://code.claude.com/docs/en/cross-session-messaging ｜已验证 | 所以权限要在开线前放开，总控批不了 |
 | ✓ 工作副本读主目录的 `settings.local.json`；`--permission-prompts none` 让没人应答的直接拒 | https://code.claude.com/docs/en/worktrees 、/headless ｜已验证（Claude Code 2.1.322 有这个参数，只对 `-p` 生效） | `tools.md` 权限一节 |
 | ✓ 同一处纠正两次还错，清空上下文、把教训写进新提示重来 | https://code.claude.com/docs/en/best-practices ｜已验证 | 第五节：重新设计后开一条上下文干净的线 |
@@ -44,7 +44,7 @@
 | 说法 | 出处 | 这套怎么办 |
 | --- | --- | --- |
 | Agent teams（领头 + 队友，共享任务表）是官方的多 agent 协作 | https://code.claude.com/docs/en/agent-teams ｜已验证 | 不拿来改代码：实验功能，队友没有各自的工作副本、不能再开队友、`/resume` 恢复不了。并行查资料、并行审可以用 |
-| 默认思考强度是 medium；改疑难 bug 调到 high / xhigh | https://code.claude.com/docs/en/model-config ｜已验证 | 按作者的用法（2026-11-16）：明确的任务中就够；讨论、设计方案才开高，Opus 用高；极高基本不用，慢、费劲，还爱自己扩大范围 |
+| 默认思考强度是 medium；改疑难 bug 调到 high / xhigh | https://code.claude.com/docs/en/model-config ｜已验证 | 按作者的用法（2026-11-16）：明确的任务中就够；讨论、设计方案才开高，最强档用高；极高基本不用，慢、费劲，还爱自己扩大范围 |
 | 用 `/loop` 定时巡检会重发总控整段上下文，费额度 | 研究子 agent 的推断，没验证 | 巡检提示词写明「要轻」，总控上下文到八成先存档再压缩 |
 
 ## 社区

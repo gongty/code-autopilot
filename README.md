@@ -16,16 +16,31 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 
 接到复杂的开发需求（从 0 到 1 做新项目、跨几个模块的大功能、重构），它让当前对话当总控，把活拆成几条线。每条线是一个独立会话，有自己的工作副本（git worktree）和分支，全自动推进，你睡觉时也能接着做。
 
+主流程是给想快速推进、从 0 到 1、尽快上线的人的：默认全自动，你只回一条开工消息。想多管一点的，开工时选「加强控制」。
+
 ### 能做什么
 
 - **总控是顶级架构师、项目总负责人**：为整个结果负责，要效果最好、token 最省。它定方案、排顺序、写任务书、验收、合并，自己不写业务代码；查找和审查交给子 agent。
-- **开工一次对齐**：要你定的（方案谁定、什么时候要、设计怎么交、哪些事要你点头）开工时一条消息问完，每项带推荐，回一句「都按推荐」就开工。
+- **先看项目再问**：已有的项目，先看规矩、计划和待办（还有没回答的问题）、测试和 CI、合并方式、真实数据、计费方式，项目里有的不再问、不另抄一份。
+- **开工一次对齐**：一条消息问完：选模式、什么时候要、哪些验收你自己来、哪些事要你点头，每项带推荐，回一句「都按推荐」就开工。小活和「收尾」这类短指令不问，说一句就做。
 - **开发原则**：第一性原理定结构；举一反三，从源头改，不打补丁；代码越少越好；只复用热门又极简的开源项目；依赖没定死不开工；测试适度，节点上集中测；文档和记忆跟着代码走。
 - **设计线**：要界面的，开一条线用 Claude Design 出稿。界面只引用一份 `tokens.css`，交活附截图对稿，对过才合，做出来和稿子不会两个样。
-- **按难度派模型**：要判断的给强模型，照单执行的给便宜一档；Fable 很贵，要用先问你。
+- **按难度派模型**：按档派，要判断的给最强档，照单执行的给中档；最贵的模型要用先问你。每档现在是哪个型号写在 `references/models.md`，换代了只改那一页。
 - **巡检**：每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
-- **额度管家**：默认开着。每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。
+- **额度管家**：默认开着。订阅的，每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。按量付费的，开工定一个预算，每次巡检对一次。
 - **合并门要快**：只跑受影响的测试，每个测试文件有硬上限，门排队，同一份代码不重跑。
+
+### 两种模式
+
+开工消息的第一项。随时说一声就能换。
+
+| | 全自动（推荐，默认） | 加强控制 |
+| --- | --- | --- |
+| 方案 | 总控定，写好发你看 | 先跟你定，你点头才开工 |
+| 设计 | 直接出 | 每批给你看 |
+| 合并 | 总控自己合、推送（走 PR 的自己合自己的 PR） | 走 PR，或合之前给你看改动 |
+| 进展 | 只报里程碑 | 每条线开工、交付都报，任务书你可以改 |
+| 要你点头的 | 上线给真实用户、花钱、删真实数据、用最贵的模型 | 同左，加上面几行 |
 
 ### 实测
 
@@ -36,7 +51,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 ### 前提
 
 - 首选 Claude Code 桌面端，这套就是在那里跑出来的。命令行、Codex 是照官方文档写的，还没在真项目里跑过。
-- 总控请设成 Opus 5.5、思考强度超高、权限自动（auto）。
+- 总控请设成最强档的模型（现在是哪个见 `references/models.md`）、思考强度超高、权限自动（auto）。
 - 默认会开 2–5 条线，额度大约 2–5 倍地烧。
 
 ### 安装
@@ -60,7 +75,7 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 
 装好就默认生效：接到复杂的开发需求就走这套，一两个文件的小改动照常直接做。
 
-也可以直接说：「这个项目你当总控，全自动推进」。
+也可以直接说：「这个项目你当总控，全自动推进」。想多管一点：「你当总控，加强控制」。
 
 ### 常见问题
 
@@ -92,6 +107,8 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 
 不会。一两个文件、半小时内改得完的，直接做。
 
+一条线、一小时左右的小活，和「收尾」「删旧的」这类短指令，走轻档：不发开工消息，说一句要做什么、动哪些、哪一步不可逆要先备份，然后就做。
+
 ### 文件
 
 | 文件 | 写什么 |
@@ -99,8 +116,9 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 | `SKILL.md` | 总控的全部规矩 |
 | `references/line-rules.md` | 每条线要守的 |
 | `references/patrol.md` | 巡检、停手、续上、纠正四段提示词 |
-| `references/quota.md` | 额度推算和一晚上的真实读数 |
-| `references/review.md` | 验收、审查、合并，合并门怎么提速 |
+| `references/quota.md` | 额度推算、按量付费的预算、一晚上的真实读数 |
+| `references/models.md` | 每档模型现在是哪个型号，换代了只改这里 |
+| `references/review.md` | 验收、审查、合并（直接合或走 PR），合并门怎么提速，改真实数据 |
 | `references/design.md` | 设计线和对稿 |
 | `references/tools.md` | 各环境的工具对照、权限 |
 | `references/workbuddy.md` | WorkBuddy 里怎么用 |
@@ -117,18 +135,33 @@ code-autopilot is an Agent Skill (`SKILL.md`) for Claude Code and Codex.
 
 For complex development work (a new project from zero, a feature spanning several modules, a refactor), it turns the current conversation into a controller that splits the work into lines. Each line is a separate session with its own git worktree and branch. The work moves forward on its own, overnight included.
 
+The main flow is for people who want to move fast, go from zero to one and launch: it is fully automatic by default, and you answer one kickoff message. If you want more control, pick "more control" at kickoff.
+
 The skill is written in Chinese; the agent reads it either way and replies in your language.
 
 ### What it does
 
 - **The controller is a top-tier architect and the project owner**: it is responsible for the result and aims for the best outcome at the lowest token cost. It plans, orders the work, writes briefs, reviews and merges, and writes no product code itself; searching and reviewing go to subagents.
-- **One kickoff message**: everything you need to decide (who owns the plan, deadline, design delivery, what needs your approval) is asked once, with a recommendation for each. Reply "all as recommended" and it starts.
+- **Looks before it asks**: on an existing project it first reads the rules, plans and todos (including questions still waiting for you), tests and CI, how branches get merged, real data, and billing. What the project already has is pointed to, not copied, and not asked again.
+- **One kickoff message**: the mode, deadline, which acceptance you do yourself, and what needs your approval are asked once, with a recommendation for each. Reply "all as recommended" and it starts. Small jobs and short instructions like "wrap up" skip this: one sentence, then it starts.
 - **Principles**: structure from first principles; fix the class of problem at its source, no patches; less code is better; reuse only popular, minimal open-source projects; nothing starts before its dependencies are settled; test in proportion, fully at merge and cutover points; docs and memory move with the code.
 - **Design line**: for anything with a UI, a line designs it in Claude Design. UI code uses one `tokens.css`; deliveries come with screenshots checked against the design before merging.
-- **Model per task**: strong models where judgment is needed, a cheaper tier for step-by-step briefs. Fable is expensive and needs your approval.
+- **Model per task, by tier**: the strongest tier where judgment is needed, the middle tier for step-by-step briefs; the most expensive model needs your approval. Which model is in which tier today lives in `references/models.md`, the only file to edit when models change.
 - **Patrols**: every 20 minutes it catches lines that are stuck, looping or over time, and corrects them.
-- **Usage manager**: on by default. It reads 5-hour and weekly usage on every patrol and projects it to the next reset. If the work won't fit, lines pause at a commit and a timer resumes them after the reset.
+- **Usage manager**: on by default. On a subscription, it reads 5-hour and weekly usage on every patrol and projects it to the next reset; if the work won't fit, lines pause at a commit and a timer resumes them after the reset. On pay-as-you-go, you agree a budget at kickoff and every patrol checks spend against it.
 - **Fast merge gate**: affected tests only, a hard time limit per test file, one gate at a time, and the same tree is never gated twice.
+
+### Two modes
+
+The first item of the kickoff message. Switch any time by saying so.
+
+| | Fully automatic (recommended, default) | More control |
+| --- | --- | --- |
+| Plan | The controller decides and sends it to you | Agreed with you first; work starts after your OK |
+| Design | Delivered directly | Each batch shown to you |
+| Merge | The controller merges and pushes (or merges its own PRs if the project uses PRs) | Through a PR, or the diff is shown to you first |
+| Progress | Milestones only | Each line's start and delivery; you may edit briefs |
+| Needs your OK | Launching to real users, spending money, deleting real data, the most expensive model | Same, plus the rows above |
 
 ### Field-tested
 
@@ -139,7 +172,7 @@ On the night of the 16th, 5 lines ran unattended: lines started at 01:12, the re
 ### Requirements
 
 - Claude Code desktop (Code tab) is the primary environment, where this was developed. The CLI and Codex instructions follow the official docs and have not run on a real project yet.
-- Set the controller to Opus 5.5, effort xhigh, permission mode auto.
+- Set the controller to the strongest-tier model (see `references/models.md` for which one that is today), effort xhigh, permission mode auto.
 - It runs 2–5 lines by default, which uses usage roughly 2–5 times as fast.
 
 ### Install
@@ -163,7 +196,7 @@ Update with `git pull` in that folder.
 
 Once installed it is the default for complex development requests; small changes to one or two files are still done directly.
 
-You can also say: "Be the controller for this project and drive it end to end."
+You can also say: "Be the controller for this project and drive it end to end." For more control: "Be the controller, with more control."
 
 ### FAQ
 
@@ -195,6 +228,8 @@ Neither has run on a real project yet.
 
 No. Changes to one or two files that take under half an hour are done directly.
 
+Jobs that fit one line in about an hour, and short instructions like "wrap up" or "remove the old one", take the light path: no kickoff message, just one sentence on what it will do, what it will touch and which step can't be undone and needs a backup, then it starts.
+
 ### Files
 
 | File | Contents |
@@ -202,8 +237,9 @@ No. Changes to one or two files that take under half an hour are done directly.
 | `SKILL.md` | All controller rules |
 | `references/line-rules.md` | Rules for every line |
 | `references/patrol.md` | Patrol, pause, resume and correct prompts |
-| `references/quota.md` | Usage projection and one night of real readings |
-| `references/review.md` | Review, merge, and a faster merge gate |
+| `references/quota.md` | Usage projection, pay-as-you-go budgets, one night of real readings |
+| `references/models.md` | Which model is in each tier today; the only file to edit when models change |
+| `references/review.md` | Review, merge (direct or via PR), a faster merge gate, changing real data |
 | `references/design.md` | Design line and design-to-code checks |
 | `references/tools.md` | Tool mapping per environment, permissions |
 | `references/workbuddy.md` | Using it in WorkBuddy |
