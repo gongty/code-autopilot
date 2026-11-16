@@ -43,3 +43,7 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 | `references/workbuddy.md` | 总控 | 在 WorkBuddy 里没有子对话时怎么开线、巡检、管积分 |
 | `references/sources.md` | 想深究的人 | 官方文档和社区做法的出处，和这套做法哪里不同 |
 | `templates/` | 总控 | 项目卡、任务书、总控备忘的模板 |
+
+## 许可
+
+MIT，见 `LICENSE`。随便用、随便改，留着版权声明就行。
