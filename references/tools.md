@@ -51,7 +51,7 @@ code-autopilot 只要四样能力：**开线**（开一个带工作副本的独�
 | 开线 | `codex --worktree`、`codex exec`（不交互地跑一件事）、`codex resume` / `fork` | |
 | 看线 | `codex agents` | |
 | 子 agent | `.codex/agents/*.toml`，可写 `model`、`model_reasoning_effort`；内置 default / worker / explorer | **只有你明说、或 AGENTS.md / skill 里写了才会开**，所以总控的提示里要写「查找和审查用子 agent」。能不能嵌套：没验证 |
-| 选模型 | 按档选，每档是哪个型号见 `models.md` | 作者的用法（2026-11-16） |
+| 选模型 | 按档选；每档是哪个，开工时看 `/model` 列出的模型和说明认，照 `models.md` | 作者的用法（2026-11-16）；`/model` 认档没在 Codex 里验证过 |
 | 思考强度 | `model_reasoning_effort`，或 `/model --reasoning=<档>` | 明确的任务用中；讨论、设计方案用高；极高基本不用（慢、费劲，爱自己扩大范围） |
 | 查额度 | 网页 chatgpt.com/codex/settings/usage；命令行 `/status` 或 `/usage`（官方两页说法不一，没验证） | Plus、Business 有 5 小时额度，Pro 目前没有；可能还有周额度 |
 | 定时 | 命令行没有；只能在 ChatGPT 网页或桌面 app 里建自动任务 | 巡检和叫醒得靠外面：比如系统定时（launchd、cron）到点跑一次 `codex exec "照 code-autopilot 巡检"`（没验证） |
@@ -60,7 +60,7 @@ code-autopilot 只要四样能力：**开线**（开一个带工作副本的独�
 
 ## 上下文：自动压缩开着，窗口 400k
 
-作者实测 400k 是甜点区：速度快，token 也不多。用户级 `~/.claude/settings.json` 里按模型设，总控和线用到的模型都要写上（改用户的设置，先问用户）。下面的模型 id 是写这页时的，换代了照 `models.md`「用到模型 id 的地方」改：
+作者实测 400k 是甜点区：速度快，token 也不多。用户级 `~/.claude/settings.json` 里按模型设，总控和线用到的模型都要写上（改用户的设置，先问用户）。id 用开工时认出来的（`models.md`「开线和子 agent 怎么写」），下面是作者 2026-11-16 的例子：
 
 ```json
 "modelSettings": {

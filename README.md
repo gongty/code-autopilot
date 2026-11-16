@@ -25,7 +25,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 - **开工一次对齐**：一条消息问完：选模式、什么时候要、哪些验收你自己来、哪些事要你点头，每项带推荐，回一句「都按推荐」就开工。小活和「收尾」这类短指令不问，说一句就做。
 - **开发原则**：第一性原理定结构；举一反三，从源头改，不打补丁；代码越少越好；只复用热门又极简的开源项目；依赖没定死不开工；测试适度，节点上集中测；文档和记忆跟着代码走。
 - **设计线**：要界面的，开一条线用 Claude Design 出稿。界面只引用一份 `tokens.css`，交活附截图对稿，对过才合，做出来和稿子不会两个样。
-- **按难度派模型**：按档派，要判断的给最强档，照单执行的给中档；最贵的模型要用先问你。每档现在是哪个型号写在 `references/models.md`，换代了只改那一页。
+- **按难度派模型**：按档派，要判断的给最强档，照单执行的给中档；最贵的模型要用先问你。每档是哪个型号不写死，总控开工时从环境里认出来（最强档就是总控自己），换代了自动跟上，不用改 skill。
 - **巡检**：每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
 - **额度管家**：默认开着。订阅的，每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。按量付费的，开工定一个预算，每次巡检对一次。
 - **合并门要快**：只跑受影响的测试，每个测试文件有硬上限，门排队，同一份代码不重跑。
@@ -51,7 +51,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 ### 前提
 
 - 首选 Claude Code 桌面端，这套就是在那里跑出来的。命令行、Codex 是照官方文档写的，还没在真项目里跑过。
-- 总控请设成最强档的模型（现在是哪个见 `references/models.md`）、思考强度超高、权限自动（auto）。
+- 总控请设成你能用的最强的模型、思考强度超高、权限自动（auto）。其余各档总控会自己认。
 - 默认会开 2–5 条线，额度大约 2–5 倍地烧。
 
 ### 安装
@@ -117,7 +117,7 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 | `references/line-rules.md` | 每条线要守的 |
 | `references/patrol.md` | 巡检、停手、续上、纠正四段提示词 |
 | `references/quota.md` | 额度推算、按量付费的预算、一晚上的真实读数 |
-| `references/models.md` | 每档模型现在是哪个型号，换代了只改这里 |
+| `references/models.md` | 每档模型开工时怎么从环境里认、认完写在哪 |
 | `references/review.md` | 验收、审查、合并（直接合或走 PR），合并门怎么提速，改真实数据 |
 | `references/design.md` | 设计线和对稿 |
 | `references/tools.md` | 各环境的工具对照、权限 |
@@ -146,7 +146,7 @@ The skill is written in Chinese; the agent reads it either way and replies in yo
 - **One kickoff message**: the mode, deadline, which acceptance you do yourself, and what needs your approval are asked once, with a recommendation for each. Reply "all as recommended" and it starts. Small jobs and short instructions like "wrap up" skip this: one sentence, then it starts.
 - **Principles**: structure from first principles; fix the class of problem at its source, no patches; less code is better; reuse only popular, minimal open-source projects; nothing starts before its dependencies are settled; test in proportion, fully at merge and cutover points; docs and memory move with the code.
 - **Design line**: for anything with a UI, a line designs it in Claude Design. UI code uses one `tokens.css`; deliveries come with screenshots checked against the design before merging.
-- **Model per task, by tier**: the strongest tier where judgment is needed, the middle tier for step-by-step briefs; the most expensive model needs your approval. Which model is in which tier today lives in `references/models.md`, the only file to edit when models change.
+- **Model per task, by tier**: the strongest tier where judgment is needed, the middle tier for step-by-step briefs; the most expensive model needs your approval. Tiers are not pinned to model names: at kickoff the controller reads the current models from its environment (the strongest tier is the controller itself), so new model generations are picked up without editing the skill.
 - **Patrols**: every 20 minutes it catches lines that are stuck, looping or over time, and corrects them.
 - **Usage manager**: on by default. On a subscription, it reads 5-hour and weekly usage on every patrol and projects it to the next reset; if the work won't fit, lines pause at a commit and a timer resumes them after the reset. On pay-as-you-go, you agree a budget at kickoff and every patrol checks spend against it.
 - **Fast merge gate**: affected tests only, a hard time limit per test file, one gate at a time, and the same tree is never gated twice.
@@ -172,7 +172,7 @@ On the night of the 16th, 5 lines ran unattended: lines started at 01:12, the re
 ### Requirements
 
 - Claude Code desktop (Code tab) is the primary environment, where this was developed. The CLI and Codex instructions follow the official docs and have not run on a real project yet.
-- Set the controller to the strongest-tier model (see `references/models.md` for which one that is today), effort xhigh, permission mode auto.
+- Set the controller to the strongest model you have, effort xhigh, permission mode auto. The controller works out the other tiers itself.
 - It runs 2–5 lines by default, which uses usage roughly 2–5 times as fast.
 
 ### Install
@@ -238,7 +238,7 @@ Jobs that fit one line in about an hour, and short instructions like "wrap up" o
 | `references/line-rules.md` | Rules for every line |
 | `references/patrol.md` | Patrol, pause, resume and correct prompts |
 | `references/quota.md` | Usage projection, pay-as-you-go budgets, one night of real readings |
-| `references/models.md` | Which model is in each tier today; the only file to edit when models change |
+| `references/models.md` | How the controller reads each tier's model from the environment at kickoff, and where it records them |
 | `references/review.md` | Review, merge (direct or via PR), a faster merge gate, changing real data |
 | `references/design.md` | Design line and design-to-code checks |
 | `references/tools.md` | Tool mapping per environment, permissions |
