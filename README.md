@@ -1,8 +1,8 @@
 # code-autopilot
 
-**写代码、做项目的自动驾驶：一个总控带 N 条线并行开发，巡检纠偏、审查合并，不撞额度。**
+**写代码、做项目的自动驾驶：一个总控带 N 条线并行开发，设计线先出稿、开发照稿做，巡检纠偏、审查合并，不撞额度。**
 
-**Autopilot for coding projects in Claude Code and Codex: one controller runs parallel coding sessions, keeps them on track, reviews and merges, and stays within usage limits.**
+**Autopilot for coding projects in Claude Code and Codex: one controller runs parallel coding sessions plus a design line the UI must match, keeps them on track, reviews and merges, and stays within usage limits.**
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-d97757) ![Codex](https://img.shields.io/badge/Codex-skill-black)
 
