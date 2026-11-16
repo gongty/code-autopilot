@@ -17,7 +17,7 @@ code-autopilot 只要四样能力：**开线**（开一个带工作副本的独�
 | 防休眠 | `request_keep_awake` | 只防闲置休眠，合盖照样睡；会话空了约 5 分钟就放开。所有线都停着等重置的那几个小时盖不住，用 `caffeinate -i -t <秒数>` |
 | 跨重启的定时 | 桌面端的「定时任务」（scheduled tasks），`fireAt` 只跑一次（一次性的别写 cron）、`cronExpression` 循环 | 写在磁盘上，应用开着才跑，关着时到点就在下次打开时补跑。**每次是一个全新的运行，不记得总控的对话**，提示词要自带全部信息；跑完会通知开它的会话。所以它叫不醒「带着上下文的总控」，只能做自带信息的事；能不能靠跑完的通知把总控叫起来：没验证 |
 | 子 agent | `Agent` | `model` 单独选；`run_in_background` 后台跑，跑完通知；新版能往下再开（见命令行一节），但改代码、要往下派活的还是开成线 |
-| 设计线 | `start_session` 开一条线，在里面用 `Artifact` 从 Design 类型新建画布出稿 | Claude Design 已并进 Claude；账号里要有 Design 类型（`Artifact` 列类型能看到）。稿子是一张设计画布，用户能看、能留言。Codex、WorkBuddy 没有，见 `design.md` 最后一节 |
+| 设计线 | `start_session` 开一条线，在里面用 `Artifact` 从 Design 类型新建画布出稿 | Claude Design 已并进 Claude；账号里要有 Design 类型（`Artifact` 列类型能看到）。稿子是一张设计画布，用户能看、能留言。Codex、WorkBuddy 没有 Claude Design，设计线本地出稿（`design-local.md`） |
 
 桌面端的两个限制（实测）：
 
@@ -54,6 +54,7 @@ code-autopilot 只要四样能力：**开线**（开一个带工作副本的独�
 | 选模型 | 按档选；每档是哪个，开工时看 `/model` 列出的模型和说明认，照 `models.md` | 作者的用法（2026-11-16）；`/model` 认档没在 Codex 里验证过 |
 | 思考强度 | `model_reasoning_effort`，或 `/model --reasoning=<档>` | 明确的任务用中；讨论、设计方案用高；极高基本不用（慢、费劲，爱自己扩大范围） |
 | 查额度 | 网页 chatgpt.com/codex/settings/usage；命令行 `/status` 或 `/usage`（官方两页说法不一，没验证） | Plus、Business 有 5 小时额度，Pro 目前没有；可能还有周额度 |
+| 设计线 | 开一条普通的线，照 `design-local.md` 本地出稿 | 截图要 Playwright 和一个浏览器（`npx playwright install chromium`），沙箱默认不联网：第一次装要用户放行。审稿要开子 agent，开线消息里写明了，它才会开。没在 Codex 里跑过 |
 | 定时 | 命令行没有；只能在 ChatGPT 网页或桌面 app 里建自动任务 | 巡检和叫醒得靠外面：比如系统定时（launchd、cron）到点跑一次 `codex exec "照 code-autopilot 巡检"`（没验证） |
 
 用 Codex 当总控时，执行的线也用 Codex，别跨家派活；但审查可以借另一家（比如在 Claude Code 里装官方的 codex 插件，让 Codex 审 Claude 写的），一个写一个审，互相不护短。

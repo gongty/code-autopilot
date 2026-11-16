@@ -24,7 +24,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 - **先看项目再问**：已有的项目，先看规矩、计划和待办（还有没回答的问题）、测试和 CI、合并方式、真实数据、计费方式，项目里有的不再问、不另抄一份。
 - **开工一次对齐**：一条消息问完：选模式、什么时候要、哪些验收你自己来、哪些事要你点头，每项带推荐，回一句「都按推荐」就开工。小活和「收尾」这类短指令不问，说一句就做。
 - **开发原则**：第一性原理定结构；举一反三，从源头改，不打补丁；代码越少越好；只复用热门又极简的开源项目；依赖没定死不开工；测试适度，节点上集中测；文档和记忆跟着代码走。
-- **设计线**：要界面的，开一条线用 Claude Design 出稿。界面只引用一份 `tokens.css`，交活附截图对稿，对过才合，做出来和稿子不会两个样。
+- **设计线**：要界面的，开一条线专门出稿，设计和开发分开。Claude 里用 Claude Design；Codex、WorkBuddy 里设计线自己写网页稿、截图自查、派子 agent 审稿，全自动也不用人管。界面只引用一份 `tokens.css`，交活附截图对稿，对过才合，做出来和稿子不会两个样。
 - **按难度派模型**：按档派，要判断的给最强档，照单执行的给中档；最贵的模型要用先问你。总控固定用 Opus 5.5、思考强度超高；线用的其余各档不写死，总控开工时从环境里认出来，换代了自动跟上。
 - **巡检**：每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
 - **额度管家**：默认开着。订阅的，每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。按量付费的，开工定一个预算，每次巡检对一次。
@@ -120,6 +120,7 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 | `references/models.md` | 每档模型开工时怎么从环境里认、认完写在哪 |
 | `references/review.md` | 验收、审查、合并（直接合或走 PR），合并门怎么提速，改真实数据 |
 | `references/design.md` | 设计线和对稿 |
+| `references/design-local.md` | 没有 Claude Design 时，设计线怎么本地出稿、截图自审 |
 | `references/tools.md` | 各环境的工具对照、权限 |
 | `references/workbuddy.md` | WorkBuddy 里怎么用 |
 | `references/sources.md` | 官方文档和社区做法的出处 |
@@ -145,7 +146,7 @@ The skill is written in Chinese; the agent reads it either way and replies in yo
 - **Looks before it asks**: on an existing project it first reads the rules, plans and todos (including questions still waiting for you), tests and CI, how branches get merged, real data, and billing. What the project already has is pointed to, not copied, and not asked again.
 - **One kickoff message**: the mode, deadline, which acceptance you do yourself, and what needs your approval are asked once, with a recommendation for each. Reply "all as recommended" and it starts. Small jobs and short instructions like "wrap up" skip this: one sentence, then it starts.
 - **Principles**: structure from first principles; fix the class of problem at its source, no patches; less code is better; reuse only popular, minimal open-source projects; nothing starts before its dependencies are settled; test in proportion, fully at merge and cutover points; docs and memory move with the code.
-- **Design line**: for anything with a UI, a line designs it in Claude Design. UI code uses one `tokens.css`; deliveries come with screenshots checked against the design before merging.
+- **Design line**: for anything with a UI, a separate line does the design, apart from the code. In Claude it uses Claude Design; in Codex and WorkBuddy it writes plain HTML mockups, screenshots them and has a subagent review them, so full-auto needs no one watching. UI code uses one `tokens.css`; deliveries come with screenshots checked against the design before merging.
 - **Model per task, by tier**: the strongest tier where judgment is needed, the middle tier for step-by-step briefs; the most expensive model needs your approval. The controller is fixed at Opus 5.5 with effort xhigh; the other tiers its lines use are not pinned to model names: at kickoff the controller reads the current models from its environment, so new model generations are picked up without editing the skill.
 - **Patrols**: every 20 minutes it catches lines that are stuck, looping or over time, and corrects them.
 - **Usage manager**: on by default. On a subscription, it reads 5-hour and weekly usage on every patrol and projects it to the next reset; if the work won't fit, lines pause at a commit and a timer resumes them after the reset. On pay-as-you-go, you agree a budget at kickoff and every patrol checks spend against it.
@@ -241,6 +242,7 @@ Jobs that fit one line in about an hour, and short instructions like "wrap up" o
 | `references/models.md` | How the controller reads each tier's model from the environment at kickoff, and where it records them |
 | `references/review.md` | Review, merge (direct or via PR), a faster merge gate, changing real data |
 | `references/design.md` | Design line and design-to-code checks |
+| `references/design-local.md` | Design without Claude Design: HTML mockups, screenshots, review |
 | `references/tools.md` | Tool mapping per environment, permissions |
 | `references/workbuddy.md` | Using it in WorkBuddy |
 | `references/sources.md` | Official docs and community sources |

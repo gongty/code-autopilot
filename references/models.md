@@ -63,4 +63,4 @@
 | 便宜 | Haiku 5.5 | 6.1 sol（Codex 没有单独的便宜档） |
 | 最贵 | Fable 5.2 | 没核 |
 
-设计线只有 Claude 有（Claude Design），Codex 没有，见 `design.md` 最后一节。
+设计线两边都开：Claude 里用 Claude Design，Codex 里本地出稿（`design-local.md`），都用最强档、思考强度高；本地出稿的审稿子 agent 用最强档、思考强度中。

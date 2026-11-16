@@ -21,7 +21,7 @@
 - 动：`<目录>`
 - 不许碰：`<目录>`（<另一条线在动 / 用户定过>）
 - 接口不许改：`<文件>`。觉得做不到就停下报告。
-- 界面（改界面的才写）：画布 `<链接>`，照 `design/index.md` 第 <几> 批的 <哪几屏> 做，画板副本 `design/canvas/<…>.dc.html`；样式只引用 `design/tokens.css` 的变量；稿上没有的屏用最朴素的样子，不自己发明视觉。
+- 界面（改界面的才写）：照 `design/index.md` 第 <几> 批的 <哪几屏> 做，稿子 <画布 `<链接>` 和画板副本 `design/canvas/<…>.dc.html` ｜ 网页稿 `design/mockups/<…>.html` 和截图 `design/shots/<…>.png`>；样式只引用 `design/tokens.css` 的变量；稿上没有的屏用最朴素的样子，不自己发明视觉。
 
 ## 环境
 
