@@ -15,6 +15,7 @@ code-autopilot 只要四样能力：**开线**（开一个带工作副本的独�
 | 定时 | `CronCreate` / `CronList` / `CronDelete` | 本地时间的 5 段 cron；`recurring: false` 是只跑一次。只活在这个会话里，关掉应用就没了；循环的 7 天后自动过期；只在会话空着时触发（正忙就等忙完）；循环的会晚触发最多半个周期（最多 30 分钟），所以别卡着整点 |
 | 跨重启的定时 | 桌面端的「定时任务」（scheduled tasks） | 写在磁盘上，应用重开还在；适合「明早 5 点叫醒」这类 |
 | 子 agent | `Agent` | `model` 单独选；`run_in_background` 后台跑，跑完通知；新版能往下再开（见命令行一节），但改代码、要往下派活的还是开成线 |
+| 设计线 | `start_session` 开一条线，在里面用 `Artifact` 选 Design 类型出稿 | Claude Design 已并进 Claude；稿子是一个设计画布，用户能看、能留言。Codex、WorkBuddy 没有，见 `design.md` 最后一节 |
 
 桌面端的两个限制（实测）：
 
