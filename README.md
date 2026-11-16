@@ -40,7 +40,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 | 设计 | 直接出 | 每批给你看 |
 | 合并 | 总控自己合、推送（走 PR 的自己合自己的 PR） | 走 PR，或合之前给你看改动 |
 | 进展 | 只报里程碑 | 每条线开工、交付都报，任务书你可以改 |
-| 要你点头的 | 上线给真实用户、花钱、删真实数据、用最贵的模型 | 同左，加上面几行 |
+| 要你点头的 | 上线给真实用户、花钱、删真实数据、清旧的、用最贵的模型 | 同左，加上面几行 |
 
 ### 实测
 
@@ -161,7 +161,7 @@ The first item of the kickoff message. Switch any time by saying so.
 | Design | Delivered directly | Each batch shown to you |
 | Merge | The controller merges and pushes (or merges its own PRs if the project uses PRs) | Through a PR, or the diff is shown to you first |
 | Progress | Milestones only | Each line's start and delivery; you may edit briefs |
-| Needs your OK | Launching to real users, spending money, deleting real data, the most expensive model | Same, plus the rows above |
+| Needs your OK | Launching to real users, spending money, deleting real data, clearing out old code and data, the most expensive model | Same, plus the rows above |
 
 ### Field-tested
 
