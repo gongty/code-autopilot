@@ -1,71 +1,106 @@
 # code-autopilot
 
-[English](README.en.md)
+**写代码、做项目的自动驾驶：一个总控带 N 条线并行开发，巡检纠偏、审查合并，不撞额度。**
+**Autopilot for coding projects in Claude Code and Codex: one controller runs parallel coding sessions, keeps them on track, reviews and merges, and stays within usage limits.**
 
-写代码、做项目的自动驾驶。用 Claude Code（或 Codex、WorkBuddy）做复杂的开发：从 0 到 1 做新项目、大功能、重构，一个总控对话带 N 条线，全自动推进，又不撞额度。
+![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-d97757) ![Codex](https://img.shields.io/badge/Codex-skill-black)
 
-- **总控是顶级架构师、项目总负责人**：为整个结果负责，要效果最好、token 最省，不是做完就行。它定方案、排顺序、写任务书、验收、合并；改代码的开成线（独立会话，各自的工作副本和分支），查找和审查交给子 agent。
-- **开工一次对齐**：要你定的（方案你定还是它定、什么时候要、设计怎么交、哪些事要你点头）开工时一条消息问完，每项带推荐，回一句「都按推荐」就开工，之后不再零碎地问。
-- **开发原则**：从第一性原理定结构；举一反三，从一个问题看到一类问题、从源头改，不打补丁；代码越少越简单越好；能复用就复用，但只挑热门又极简的开源项目；依赖没定死不开工，一个功能不反复开发；测试适度，节点上集中测；文档和记忆跟着代码走。
-- **设计线**：要界面的，开一条线用 Claude Design 出稿，存进仓库；界面只引用一份设计规范，交活附截图对稿，对过才合，做出来和稿子不会两个样。直接出、先挑方向、每批都看，由你选。
-- **按难度派模型和思考强度**：要判断边界的给强模型，任务书写到能照单执行的给便宜一档；Fable 很贵，默认不用，要用先问你。
-- **定时巡检**：有线在跑就每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
-- **额度管家**：默认就开，不用你同意。每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上、定时等额度恢复再接着做。你明说「不管额度、越快越好」才放开。
-- **合并门要快**：只跑受影响的测试、每个测试文件有硬上限、线和合流用同一个门、门排队、过了门的同一份代码不重跑。
+[中文](#中文) · [English](#english) · [安装 Install](#安装-install) · [常见问题 FAQ](#常见问题-faq)
 
-来历：2026-11-15 到 16，作者用一个总控对话先后带 7 条线做完一次完整重构；16 号夜里那段 5 条线，没人盯，5 小时额度没撞墙（前一天撞过一次组织的花费上限，空转了 3 小时，额度管家就是这么来的）。真实读数和踩过的坑在 `references/quota.md`、`references/review.md`。
+## 中文
 
-## 前提
+code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md`）。接到复杂的开发需求（从 0 到 1 做新项目、跨几个模块的大功能、重构），它让当前对话当总控，把活拆成几条线，每条线一个独立会话、自己的工作副本（git worktree）和分支，全自动推进；你睡觉时也能接着做。
 
-- **首选 Claude Code 桌面端**（Code 标签页）：开线、看线、查额度、设计线用的都是桌面端的工具，这套就是在这里跑出来的。命令行、Codex 的做法是查文档得来的，还没在真项目里跑过；WorkBuddy 只读过程序、没真跑过。
-- 总控用 Opus 5.5、思考强度超高、权限自动（auto），由你在会话里设：线的模型和强度不能比总控高，权限不放开线会停下来等你点。
-- 订阅制的额度：默认会开 2–5 条线并行，大约就是 2–5 倍地烧额度。额度管家会管着不撞墙，但一晚上用掉一两成周额度是正常的。
+- **总控是顶级架构师、项目总负责人**：为整个结果负责，要效果最好、token 最省。它定方案、排顺序、写任务书、验收、合并，自己不写业务代码；查找和审查交给子 agent。
+- **开工一次对齐**：要你定的（方案谁定、什么时候要、设计怎么交、哪些事要你点头）开工时一条消息问完，每项带推荐，回一句「都按推荐」就开工。
+- **开发原则**：第一性原理定结构；举一反三，从源头改，不打补丁；代码越少越好；只复用热门又极简的开源项目；依赖没定死不开工；测试适度，节点上集中测；文档和记忆跟着代码走。
+- **设计线**：要界面的，开一条线用 Claude Design 出稿；界面只引用一份 `tokens.css`，交活附截图对稿，对过才合，做出来和稿子不会两个样。
+- **按难度派模型**：要判断的给强模型，照单执行的给便宜一档；Fable 很贵，要用先问你。
+- **巡检**：每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
+- **额度管家**：默认开着。每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。
+- **合并门要快**：只跑受影响的测试，每个测试文件有硬上限，门排队，同一份代码不重跑。
 
-## 安装
+**实测**：2026-11-15 到 16，作者用一个总控对话先后带 7 条线做完一次完整重构。16 号夜里 5 条线没人盯，01:12 开线、09:46 上线，周额度用了约 20 个点，5 小时额度没撞墙。读数和踩过的坑在 `references/quota.md`、`references/review.md`。
 
-整个仓库就是一个 skill，克隆进 skill 目录就装好了：
+**前提**：首选 Claude Code 桌面端（这套就是在那里跑出来的）；命令行、Codex 是照官方文档写的，还没在真项目里跑过。总控请设成 Opus 5.5、思考强度超高、权限自动（auto）。默认会开 2–5 条线，额度大约 2–5 倍地烧。
+
+**用法**：装好就默认生效，接到复杂的开发需求就走这套，一两个文件的小改动照常直接做。也可以直接说「这个项目你当总控，全自动推进」。
+
+## English
+
+code-autopilot is an Agent Skill (`SKILL.md`) for Claude Code and Codex. For complex development work (a new project from zero, a feature spanning several modules, a refactor), it turns the current conversation into a controller that splits the work into lines: each line is a separate session with its own git worktree and branch. The work moves forward on its own, overnight included. The skill is written in Chinese; the agent reads it either way and replies in your language.
+
+- **The controller is a top-tier architect and the project owner**: it is responsible for the result and aims for the best outcome at the lowest token cost. It plans, orders the work, writes briefs, reviews and merges, and writes no product code itself; searching and reviewing go to subagents.
+- **One kickoff message**: everything you need to decide (who owns the plan, deadline, design delivery, what needs your approval) is asked once, with a recommendation for each. Reply "all as recommended" and it starts.
+- **Principles**: structure from first principles; fix the class of problem at its source, no patches; less code is better; reuse only popular, minimal open-source projects; nothing starts before its dependencies are settled; test in proportion, fully at merge and cutover points; docs and memory move with the code.
+- **Design line**: for anything with a UI, a line designs it in Claude Design. UI code uses one `tokens.css`; deliveries come with screenshots checked against the design before merging.
+- **Model per task**: strong models where judgment is needed, a cheaper tier for step-by-step briefs. Fable is expensive and needs your approval.
+- **Patrols**: every 20 minutes it catches lines that are stuck, looping or over time, and corrects them.
+- **Usage manager**: on by default. It reads 5-hour and weekly usage on every patrol and projects it to the next reset. If the work won't fit, lines pause at a commit and a timer resumes them after the reset.
+- **Fast merge gate**: affected tests only, a hard time limit per test file, one gate at a time, and the same tree is never gated twice.
+
+**Field-tested**: on 2026-11-15/16 the author used one controller conversation to lead 7 lines through a complete refactor. On the night of the 16th, 5 lines ran unattended from 01:12 to release at 09:46, using about 20 points of weekly usage without hitting the 5-hour limit. Readings and lessons are in `references/quota.md` and `references/review.md`.
+
+**Requirements**: Claude Code desktop (Code tab) is the primary environment, where this was developed; the CLI and Codex instructions follow the official docs and have not run on a real project yet. Set the controller to Opus 5.5, effort xhigh, permission mode auto. It runs 2–5 lines by default, which uses usage roughly 2–5 times as fast.
+
+**Usage**: once installed it is the default for complex development requests; small changes to one or two files are still done directly. You can also say "be the controller for this project and drive it end to end".
+
+## 安装 Install
+
+整个仓库就是一个 skill，克隆进 skill 目录就装好了。The whole repo is one skill; clone it into a skills folder.
 
 ```bash
 git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopilot
 ```
 
-| 用什么 | 克隆到哪 |
+| 用什么 Tool | 克隆到哪 Clone to |
 | --- | --- |
-| Claude Code，所有项目通用 | `~/.claude/skills/code-autopilot` |
-| Claude Code，只给一个项目用 | `<项目>/.claude/skills/code-autopilot` |
-| Codex | `~/.agents/skills/code-autopilot`（Codex 不读 `.claude/skills`） |
-| 腾讯 WorkBuddy | `~/.workbuddy/skills/code-autopilot`（还没真跑过，见 `references/workbuddy.md`） |
+| Claude Code，所有项目 / all projects | `~/.claude/skills/code-autopilot` |
+| Claude Code，一个项目 / one project | `<项目 project>/.claude/skills/code-autopilot` |
+| Codex | `~/.agents/skills/code-autopilot`（Codex 不读 / does not read `.claude/skills`） |
+| 腾讯 WorkBuddy | `~/.workbuddy/skills/code-autopilot`（还没真跑过 / not run yet，见 see `references/workbuddy.md`） |
 
-更新：在那个目录里 `git pull`。同一份 `SKILL.md` 几家都能读；工具叫法不同的地方写在 `references/tools.md`。WorkBuddy 的总控开不了新对话，线改成后台队友或你手动开的对话，写在 `references/workbuddy.md`。
+更新 Update：`git pull`。
 
-## 用法
+## 常见问题 FAQ
 
-装好以后，接到相对复杂的开发需求就默认用这套：从 0 到 1 做新项目、加跨几个模块的大功能、重构都算，一两个文件的小改动照常直接做。也可以直接说「这个项目你当总控，全自动推进」。
+**和子 agent、agent teams 有什么不同？ How is this different from subagents or agent teams?**
+子 agent 的结果回到总控、占总控的上下文，用户也打不开它；agent teams 的队友共用一个目录，没有各自的工作副本。这里的每条线是完整的独立会话：自己的工作副本和上下文，做完还能接着派活，你也能点进去直接说话。
+Subagent results flow back into the controller's context and you can't open them; agent-team teammates share one directory without their own worktrees. Each line here is a full session with its own worktree and context, can take the next task when done, and you can open it and talk to it.
 
-- **开工**：它先发一条对齐消息，你回一句「都按推荐」或改几项就行。说了「我睡了你接着做」的，它直接按推荐定、不等你。
-- **新项目**：先开一条骨架线搭好目录、测试和合并前的门，功能线先开好等着，骨架合进去再开工。
-- **重构**：先定范围、新老功能怎么交接、开发计划（选了「一起定」的，你点头了再拆线）。项目乱了、找不准根因，先跑一次项目梳理（`templates/audit-prompt.md`，只读，出报告）。
-- **有界面的**：同时开一条设计线，用 Claude Design 出稿（只有 Claude Code 能开）。
-- **第一次在一个项目里用**：它会建项目卡 `.code-autopilot/project.md`（测试命令、门、端口、不许碰的东西、你定过的事）。
+**会不会把额度烧光？ Will it burn through my usage limits?**
+开 N 条线大约 N 倍地烧。额度管家每次巡检推算到重置时的用量，超过 85% 就让离关键路径最远的线停在一个提交上，重置后定时叫醒。
+N lines use roughly N times the usage. On every patrol it projects usage to the next reset; above 85% it pauses the lines furthest from the critical path at a commit and wakes them after the reset.
 
-## 文件
+**能整夜没人盯吗？ Can it run overnight unattended?**
+能，实测过一晚。要开着桌面端、接电源、别合盖，权限设成自动（auto），不然线会停下来等你点「允许」。
+Yes, tested over one night. Keep the desktop app open, plugged in, lid open, and use auto permission mode, or lines will stop and wait for you to click "allow".
 
-| 文件 | 给谁看 | 写什么 |
-| --- | --- | --- |
-| `SKILL.md` | 总控 | 全部规矩，一页 |
-| `references/line-rules.md` | 每条线 | 线要守的（复制成项目的 `.code-autopilot/briefs/common.md`） |
-| `references/patrol.md` | 总控 | 巡检、停手、续上、纠正四段提示词 |
-| `references/quota.md` | 总控 | 额度推算和一晚上的真实读数 |
-| `references/review.md` | 总控 | 验收、审查、合并的细则，合并门怎么提速 |
-| `references/design.md` | 总控、设计线 | 设计线：怎么写总纲、三种交法、怎么让开发照稿做、对稿 |
-| `references/tools.md` | 总控 | 四样能力在 Claude Code 桌面端、命令行、Codex 里叫什么，权限怎么放 |
-| `references/workbuddy.md` | 总控 | 在 WorkBuddy 里没有子对话时怎么开线、巡检、管积分 |
-| `references/sources.md` | 想深究的人 | 官方文档和社区做法的出处，和这套做法哪里不同 |
-| `templates/kickoff.md` | 总控 | 开工对齐的那条消息 |
-| `templates/plan.md` | 总控 | 方案和开发计划：复用、步骤和依赖、时间表 |
-| `templates/project.md`、`brief.md`、`notes.md`、`design-brief.md` | 总控 | 项目卡、任务书、总控备忘、设计总纲 |
-| `templates/audit-prompt.md` | 只读的线 | 项目梳理提示词：照代码证据找结构问题的根因，防止项目变成屎山 |
+**能用在 Codex、WorkBuddy 吗？ Does it work with Codex or WorkBuddy?**
+同一份 `SKILL.md` 都能读，工具叫法的对照在 `references/tools.md`；WorkBuddy 开不了新对话，替代办法在 `references/workbuddy.md`。两边都还没在真项目里跑过。
+Both read the same `SKILL.md`; tool mappings are in `references/tools.md`. WorkBuddy can't open new conversations; the workaround is in `references/workbuddy.md`. Neither has run on a real project yet.
 
-## 许可
+**小改动也会开线吗？ Does it open lines for small changes?**
+不会。一两个文件、半小时内改得完的，直接做。
+No. Changes to one or two files that take under half an hour are done directly.
 
-MIT，见 `LICENSE`。随便用、随便改，留着版权声明就行。
+## 文件 Files
+
+| 文件 File | 写什么 Contents |
+| --- | --- |
+| `SKILL.md` | 总控的全部规矩 / all controller rules |
+| `references/line-rules.md` | 每条线要守的 / rules for every line |
+| `references/patrol.md` | 巡检、停手、续上、纠正四段提示词 / patrol, pause, resume, correct prompts |
+| `references/quota.md` | 额度推算和一晚上的真实读数 / usage projection and one night of real readings |
+| `references/review.md` | 验收、审查、合并，合并门怎么提速 / review, merge, faster merge gate |
+| `references/design.md` | 设计线和对稿 / design line and design-to-code checks |
+| `references/tools.md` | 各环境的工具对照、权限 / tool mapping per environment, permissions |
+| `references/workbuddy.md` | WorkBuddy 里怎么用 / using it in WorkBuddy |
+| `references/sources.md` | 官方文档和社区做法的出处 / official docs and community sources |
+| `templates/kickoff.md`、`plan.md` | 开工对齐、开发计划 / kickoff message, development plan |
+| `templates/project.md`、`brief.md`、`notes.md`、`design-brief.md` | 项目卡、任务书、总控备忘、设计总纲 / project card, line brief, controller notes, design brief |
+| `templates/audit-prompt.md` | 项目梳理提示词，防止项目变成屎山 / project audit prompt that finds structural root causes |
+
+## 许可 License
+
+MIT，见 / see `LICENSE`。
