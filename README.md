@@ -29,6 +29,7 @@ code-autopilot 是一个给 Claude Code 和 Codex 用的 Agent Skill（`SKILL.md
 - **按难度派模型**：按档派，要判断的给最强档，照单执行的给中档；最贵的模型要用先问你。总控固定用 Opus 5.5、思考强度超高；线用的其余各档不写死，总控开工时从环境里认出来，换代了自动跟上。
 - **巡检**：每 20 分钟看一次，卡住、原地打转、超时的当场纠正。
 - **额度管家**：默认开着。订阅的，每次巡检查 5 小时和周额度，推算到重置时会不会超；不够就让线停在一个提交上，定时等额度恢复再接着做。按量付费的，开工定一个预算，每次巡检对一次。
+- **上线前全仓体检**：每条线的审查只看自己的 diff，几条线合到一起后，上线、切换之前再派一条只读的线把整个仓库看一遍，按要紧程度排出具体的错，必须修的修完才上线。做法取自 ponytail 的 `ponytail-audit`。
 - **合并门要快**：只跑受影响的测试，每个测试文件有硬上限，门排队，同一份代码不重跑。
 
 ### 两种模式
@@ -128,6 +129,7 @@ git clone https://github.com/gongty/code-autopilot ~/.claude/skills/code-autopil
 | `templates/kickoff.md`、`plan.md` | 开工对齐、开发计划 |
 | `templates/project.md`、`brief.md`、`notes.md`、`design-brief.md` | 项目卡、任务书、总控备忘、设计总纲 |
 | `templates/audit-prompt.md` | 项目梳理提示词，防止项目变成屎山 |
+| `templates/health-check.md` | 全仓体检提示词：上线、切换之前找具体的错，排好先修哪个 |
 
 ---
 
@@ -152,6 +154,7 @@ The skill is written in Chinese; the agent reads it either way and replies in yo
 - **Model per task, by tier**: the strongest tier where judgment is needed, the middle tier for step-by-step briefs; the most expensive model needs your approval. The controller is fixed at Opus 5.5 with effort xhigh; the other tiers its lines use are not pinned to model names: at kickoff the controller reads the current models from its environment, so new model generations are picked up without editing the skill.
 - **Patrols**: every 20 minutes it catches lines that are stuck, looping or over time, and corrects them.
 - **Usage manager**: on by default. On a subscription, it reads 5-hour and weekly usage on every patrol and projects it to the next reset; if the work won't fit, lines pause at a commit and a timer resumes them after the reset. On pay-as-you-go, you agree a budget at kickoff and every patrol checks spend against it.
+- **Whole-repo health check before launch**: each review only sees one line's diff, so before launch or cutover a read-only line audits the merged repo, ranks concrete bugs, and must-fix items are fixed first. Adapted from ponytail's `ponytail-audit`.
 - **Fast merge gate**: affected tests only, a hard time limit per test file, one gate at a time, and the same tree is never gated twice.
 
 ### Two modes
@@ -251,6 +254,7 @@ Jobs that fit one line in about an hour, and short instructions like "wrap up" o
 | `templates/kickoff.md`, `plan.md` | Kickoff message, development plan |
 | `templates/project.md`, `brief.md`, `notes.md`, `design-brief.md` | Project card, line brief, controller notes, design brief |
 | `templates/audit-prompt.md` | Project audit prompt that finds structural root causes |
+| `templates/health-check.md` | Whole-repo health check before launch or cutover: concrete bugs, ranked |
 
 ---
 

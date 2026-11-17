@@ -55,7 +55,7 @@
 | Simon Willison | 并行的瓶颈在人审代码；适合研究、小维护、规格写清了的活 | https://simonwillison.net/2025/Oct/5/parallel-coding-agents/ ｜已验证 |
 | ccusage | `blocks` 按 5 小时窗口统计，是从本地日志估的 | https://github.com/ryoppippi/ccusage ｜已验证 |
 | Claude-Code-Usage-Monitor | 按消耗速度预测几点用完；它自己说状态栏 `rate_limits` 更准 | https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor ｜已验证 |
-| ponytail（DietrichGebert/ponytail，MIT） | 让 agent 少写代码的一份 prompt：写之前走梯子（它原文七级，这里把标准库和平台并成一级，共六级，见 `line-rules.md`「写代码」），永远不省校验、防丢数据、安全、无障碍；有风险的逻辑留一个小测试；`shortcut:` 注释标出捷径的限制；审查「没有具体场景就不算问题」、每条写是什么 / 问题 / 修法 / 不修会怎样。作者自测（Opus 5.5，39 个任务各 5 次）：代码少 53%、花费少 26%，有风险的逻辑带测试 98%（不装 68%）；独立测试也说代码确实少，但必须写完大块功能的 agent 任务里，工具调用和花费可能反而变多 | https://github.com/DietrichGebert/ponytail ｜读了 skill 原文和 benchmark 说明（2026-11-18）；数字是对方自测的，没自己复现。并进了 `line-rules.md`「写代码」、报告的「梯子」、任务书「能复用的 / 不做」、`review.md`「先看」和「给审查员的话」、项目卡「预期负载」。没并的：ultra 档（会反过来质疑需求，和「只做任务书里的事」冲突）、状态栏和看板的钩子。装了 ponytail 插件也不冲突，线保持默认的 full 档 |
+| ponytail（DietrichGebert/ponytail，MIT） | 让 agent 少写代码的一份 prompt：写之前走梯子（它原文七级，这里把标准库和平台并成一级，共六级，见 `line-rules.md`「写代码」），永远不省校验、防丢数据、安全、无障碍；有风险的逻辑留一个小测试；`shortcut:` 注释标出捷径的限制；审查「没有具体场景就不算问题」、每条写是什么 / 问题 / 修法 / 不修会怎样。作者自测（Opus 5.5，39 个任务各 5 次）：代码少 53%、花费少 26%，有风险的逻辑带测试 98%（不装 68%）；独立测试也说代码确实少，但必须写完大块功能的 agent 任务里，工具调用和花费可能反而变多 | https://github.com/DietrichGebert/ponytail ｜读了 skill 原文和 benchmark 说明（2026-11-18）；数字是对方自测的，没自己复现。并进了 `line-rules.md`「写代码」、报告的「梯子」、任务书「能复用的 / 不做」、`review.md`「先看」和「给审查员的话」、项目卡「预期负载」；`ponytail-audit` 改写成 `templates/health-check.md`（全仓体检），排在上线、切换之前（2026-11-18）。没并的：ultra 档（会反过来质疑需求，和「只做任务书里的事」冲突）、状态栏和看板的钩子。装了 ponytail 插件也不冲突，线保持默认的 full 档 |
 | Ralph 循环 | 每轮只做一件事，状态放在计划文件里，靠测试和类型检查挡坏输出 | https://ghuntley.com/ralph/ ｜已验证（发布日期没验证） |
 
 ## Codex 和腾讯
